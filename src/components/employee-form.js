@@ -6,7 +6,7 @@ import "@vaadin/button";
 import { msg, updateWhenLocaleChanges } from "@lit/localize";
 import { Router } from "@vaadin/router";
 
-class EmployeeForm extends LitElement {
+export class EmployeeForm extends LitElement {
   static styles = css`
     .employee-form {
       padding: 2rem;
@@ -183,7 +183,7 @@ class EmployeeForm extends LitElement {
         <vaadin-text-field
           class="text-input"
           label=${label}
-          .value=${this.formData[field]}
+          value=${this.formData[field]}
           placeholder=${options.placeholder || ""}
           maxlength=${options.maxlength || ""}
           allowed-char-pattern=${options.pattern || ""}
@@ -202,7 +202,7 @@ class EmployeeForm extends LitElement {
         <vaadin-date-picker
           class="text-input"
           label=${label}
-          .value=${this.formData[field]}
+          value=${this.formData[field]}
           @value-changed=${(e) => this.updateFormData(field, e.target.value)}
         ></vaadin-date-picker>
         ${this.errors[field] &&
@@ -217,7 +217,7 @@ class EmployeeForm extends LitElement {
         <vaadin-select
           class="text-input"
           label=${label}
-          .value=${this.formData[field]}
+          value=${this.formData[field]}
           .items=${items}
           @value-changed=${(e) => this.updateFormData(field, e.target.value)}
         ></vaadin-select>
@@ -254,12 +254,15 @@ class EmployeeForm extends LitElement {
       newErrors.email = msg("Enter valid email");
     }
 
-    if (this.employees) {
-      const hasAlreadyEmailUser = this.employees.find(
-        (emp) => emp.email === email
-      );
-      if (hasAlreadyEmailUser && !urlParams.get("edit")) {
-        newErrors.email = msg("This email is taken");
+    if (this.employees.length > 0) {
+      const selectedUser = this.employees.find((emp) => emp.email === email);
+      if (selectedUser) {
+        const isEditingSameEmployee =
+          urlParams.get("edit") && selectedUser.email === empEmail;
+
+        if (!isEditingSameEmployee) {
+          newErrors.email = msg("This email is taken");
+        }
       }
     }
 
